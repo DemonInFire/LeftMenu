@@ -1,3 +1,4 @@
 import { Icon } from './Icon';
+import { Modal } from './Modal';
 
-export { Icon };
+export { Icon, Modal };

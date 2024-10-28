@@ -1,15 +1,16 @@
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 
-const SubMenuWrapper = styled.div<{$isItemActive: boolean, $isOpen: boolean, $isHovered: boolean}>`
+const SubMenuWrapper = styled.div<{$isItemActive: boolean, $isOpen: boolean, $isScreenSm: boolean}>`
   position: ${({$isOpen}) => $isOpen ? 'static' : 'absolute'};
-  left: ${({$isOpen}) => $isOpen ? 'auto' : '74px'};
+  left: ${({$isOpen, $isScreenSm}) => $isOpen ? 'auto' : $isScreenSm ? 0 : '74px'};
+  bottom: ${({$isScreenSm}) => $isScreenSm ? '67px' : 'auto'};
   flex-direction: column;
   background-color: yellow;
   transition: .5s linear;
   visibility: ${({$isOpen, $isItemActive}) => $isOpen && $isItemActive ? 'visable' : 'hidden'};
   opacity: ${({$isOpen, $isItemActive}) => $isOpen && $isItemActive ? 1 : 0};
-  display: ${({$isOpen, $isItemActive}) => ($isOpen && $isItemActive) || !$isOpen ? 'flex' : 'none'};;
+  display: ${({$isOpen, $isItemActive}) => ($isOpen && $isItemActive) || !$isOpen ? 'flex' : 'none'};
 `;
 
 const MainWrapper = styled.div<{$isOpen: boolean}>`
@@ -27,8 +28,6 @@ const MainWrapper = styled.div<{$isOpen: boolean}>`
       opacity: ${({$isOpen}) => !$isOpen && '1'};
     }
   }
-
-  ${({$isOpen}) => $isOpen ? `` : ``}
 `;
 
 const NavLinkWrapper = styled.div<{$isOpen: boolean}>`
@@ -46,7 +45,7 @@ const StyledNavLink = styled(NavLink)<{$isOpen: boolean, $isItemActive: boolean}
   font-size: 16px;
   padding: 12px;
   margin: -12px 0 0 -12px;
-  display: block;
+  display: flex;
   height: 43px;
   text-decoration: none;
   width: ${({$isOpen}) => $isOpen ? '200px' : '50px'};

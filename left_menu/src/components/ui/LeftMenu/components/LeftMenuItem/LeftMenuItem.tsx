@@ -1,16 +1,16 @@
 import { useLocation } from "react-router-dom";
 
 import { createLink } from "../../../../../helpers/link";
-import { Icon } from "../../../../core";
+import { Icon, Modal } from "../../../../core";
 
 import TLeftMenuItemProps from "./LeftMenuItem.type";
 import { useEffect, useState } from "react";
 import Styled from './LeftMenuItem.style';
 
-const LeftMenuItem = ({config, isOpen, parentLink = '', isSubMenu}: TLeftMenuItemProps) => {
+const LeftMenuItem = ({config, isOpen, parentLink = '', isSubMenu, closeModal, isScreenSm}: TLeftMenuItemProps) => {
   const [newLink, setNewLink] = useState('');
   const [isItemActive, setIsItemActive] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const location = useLocation();
 
@@ -37,55 +37,88 @@ const LeftMenuItem = ({config, isOpen, parentLink = '', isSubMenu}: TLeftMenuIte
   }, [location.pathname]);
 
   const handleClick = () => {
-    setIsItemActive(true)
-  };
-
-  const onMouseEnter = () => {
-    if (!isOpen) {
-      setIsHovered(true)
+    if (isScreenSm && !isSubMenu) {
+      setIsModalOpen(true)
+    } else if (isSubMenu && closeModal) {
+      closeModal()
+    } else {
+      setIsItemActive(true)
     }
   };
 
-  const onMouseLeave = () => {
-    if (!isOpen) {
-      setIsHovered(false)
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+  };
+
+  const handleTouch = () => {
+    setIsModalOpen(true)
+  };
+
+  const handleNavLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (isScreenSm && config.subMenu) {
+      e.preventDefault()
     }
   };
 
   return (
-    <Styled.MainWrapper $isOpen={isOpen}>
-      <Styled.NavLinkWrapper 
-        $isOpen={isOpen} 
-        onMouseEnter={onMouseEnter} 
-        onMouseLeave={onMouseLeave} 
-        onClick={handleClick}
-      >
-        <Styled.StyledNavLink
-          to={newLink}
-          $isItemActive={isItemActive}
-          $isOpen={isOpen}
-        >
-          {isSubMenu ? 
-            isOpen && '•' 
-          : 
-            <Styled.IconWrapper>
-              <Icon size="s" type="bird" />
-            </Styled.IconWrapper>
-          }
-          {isOpen || isSubMenu ? config.menuName : ''}
-        </Styled.StyledNavLink>
-      </Styled.NavLinkWrapper>
-      <Styled.SubMenuWrapper $isItemActive={isItemActive} $isOpen={isOpen} $isHovered={isHovered} id={'submenu-wrapper'}>
-        {config.subMenu ? 
+    <>
+      {isScreenSm && config.subMenu &&
+        <Modal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}> 
           <>
             {!isOpen && <Styled.Title>{config.menuName}</Styled.Title>}
-            {config.subMenu.map(subConfig => <LeftMenuItem config={subConfig} parentLink={newLink} key={subConfig.menuName} isOpen={isOpen} isSubMenu={true} />)}
+            {config.subMenu.map(subConfig => <LeftMenuItem 
+              config={subConfig} 
+              parentLink={newLink} 
+              key={subConfig.menuName} 
+              isScreenSm={isScreenSm} 
+              isOpen={isOpen} 
+              closeModal={handleCloseModal}
+              isSubMenu 
+            />)}
           </>
-        : 
-          !isOpen && !isSubMenu && <div>{config.menuName}</div>
-        }
-      </Styled.SubMenuWrapper>
-    </Styled.MainWrapper>
+        </Modal>
+      }
+      <Styled.MainWrapper $isOpen={isOpen}>
+        <Styled.NavLinkWrapper 
+          $isOpen={isOpen} 
+          onTouchStart={handleTouch}
+          onClick={handleClick}
+        >
+          <Styled.StyledNavLink
+            to={newLink}
+            onClick={handleNavLinkClick}
+            $isItemActive={isItemActive}
+            $isOpen={isOpen}
+          >
+            {isSubMenu ? 
+              isOpen && '•' 
+            : 
+              <Styled.IconWrapper>
+                <Icon size="s" type="bird" />
+              </Styled.IconWrapper>
+            }
+            {isOpen || isSubMenu ? config.menuName : ''}
+          </Styled.StyledNavLink>
+        </Styled.NavLinkWrapper>
+        <Styled.SubMenuWrapper $isItemActive={isItemActive} $isOpen={isOpen} $isScreenSm={isScreenSm} id={'submenu-wrapper'}>
+          {config.subMenu ? 
+            <>
+              {!isOpen && !isScreenSm && <Styled.Title>{config.menuName}</Styled.Title>}
+              {!isScreenSm && config.subMenu.map(subConfig => <LeftMenuItem 
+                config={subConfig} 
+                parentLink={newLink} 
+                key={subConfig.menuName} 
+                isScreenSm={isScreenSm} 
+                isOpen={isOpen} 
+                isSubMenu 
+              />)}
+            </>
+          : 
+            !isOpen && !isSubMenu && !isScreenSm && <div>{config.menuName}</div>
+          }
+        </Styled.SubMenuWrapper>
+      </Styled.MainWrapper>
+    </>
   )
 };
 
