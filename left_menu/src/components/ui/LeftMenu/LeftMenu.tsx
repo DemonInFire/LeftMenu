@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Icon } from "../../core";
+import { useResize } from "../../../hooks/useResize";
 
 import { LeftMenuItem } from "./components";
 import TLeftMenuProps from "./LeftMenu.type";
@@ -13,13 +14,23 @@ const LeftMenu = ({leftMenuConfig}: TLeftMenuProps) => {
     setIsOpen(!isOpen)
   };
 
+  const { isScreenSm } = useResize();
+
+  useEffect(() => {
+    if (isScreenSm) {
+      setIsOpen(false)
+    }
+  }, [isScreenSm]);
+
   return (
     <Styled.MainWrapper>
       <div>
-        <Styled.Wrapper>
-          {leftMenuConfig.map(config => <LeftMenuItem config={config} isOpen={isOpen} key={config.menuName} />)}
+        <Styled.Wrapper $isScreenSm={isScreenSm}>
+          {leftMenuConfig.map(config => <LeftMenuItem config={config} isOpen={isOpen} key={config.menuName} isScreenSm={isScreenSm} />)}
         </Styled.Wrapper>
-        <Icon size="s" type="bird" handleClick={handleClick}/>
+        {!isScreenSm &&
+          <Icon size="s" type="bird" handleClick={handleClick}/>
+        }
       </div>
     </Styled.MainWrapper>
   )
