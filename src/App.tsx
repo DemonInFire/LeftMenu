@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
+import { createHashRouter, Navigate, RouterProvider } from "react-router-dom";
 import { FullScreen } from "./components/ui";
 import { allPathes } from "./const/path";
 import Reports from "./containers/reports/Reports";
@@ -10,7 +10,7 @@ import { ClientRootList } from "./roots/ClientRoot";
 import { InventoryRootList } from "./roots/InventoryRootList";
 
 const App = () => {
-  const router = createBrowserRouter([
+  const router = createHashRouter([
     {
       element: <FullScreen />,
       children: [
